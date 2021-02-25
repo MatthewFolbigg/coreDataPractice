@@ -14,17 +14,24 @@ class ViewController: UIViewController, UITextViewDelegate {
     
     var dataController: DataController!
     var note: Note?
+    var noteId = "Main Note"
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        note = Note(context: dataController.viewContext)
         fetchData()
+        if note == nil {
+            note = Note(context: dataController.viewContext)
+            note?.noteId = noteId
+        }
         textView.text = note?.text
         // Do any additional setup after loading the view.
     }
     
     func fetchData() {
         let fetchRequest: NSFetchRequest = Note.fetchRequest()
+        let predicate = NSPredicate(format: "noteId = %@", noteId)
+        fetchRequest.predicate = predicate
+        
         if let data = try? dataController.viewContext.fetch(fetchRequest) {
             print("Notes in loaded data: \(data.count)")
             guard data.count > 0  else {
